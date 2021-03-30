@@ -1,0 +1,19 @@
+#!/bin/bash
+# Descarga de URLs blacklisteadas
+# Spamhaus EDROP list (Extended Don't Route Or Peer Lists)
+
+wget https://www.spamhaus.org/drop/edrop.txt &&
+
+mv edrop.txt spamhausEDROPlst &&
+
+sed -i.bak '/^;/d' ./spamhausEDROPlst &&
+
+sed -i.bak 's/ ; .*$/ ; /g' ./spamhausEDROPlst &&
+
+awk '{ printf "add list=blacklist comment=blacklist address="; print }' spamhausEDROPlst > spamhausEDROPlst.000 &&
+
+echo "/ip firewall address-list" > tmp.txt && cat tmp.txt spamhausEDROPlst.000 > spamhausEDROPlst.rsc &&
+
+sed -i.bak 's/ ; //g' spamhausEDROPlst.rsc &&
+
+rm spamhausEDROPlst spamhausEDROPlst.000 tmp.txt *.bak
